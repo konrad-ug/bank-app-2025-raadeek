@@ -9,4 +9,16 @@ class TestAccount:
         assert account.balance == 0.0
         assert account.pesel == "12345678911"
 
+    def test_pesel_too_length(self):
+        account = Account("John", "Doe", "12345678911")
+        assert account.pesel == "12345678911"
 
+
+    def test_pesel_too_short(self):
+        account = Account("John", "Doe", "12345678911")
+        assert account.pesel == "12345678911"
+
+    
+    def test_pesel_non_numeric(self):
+        account = Account("John", "Doe", "12345678911")
+        assert account.pesel == "12345678911"
