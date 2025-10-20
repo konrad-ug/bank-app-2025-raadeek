@@ -9,6 +9,8 @@ class TestAccount:
         assert account.balance == 0.0
         assert account.pesel == "12345678911"
 
+
+class TestPesel:
     def test_pesel_too_length(self):
         account = Account("John", "Doe", "12345678911")
         assert account.pesel == "12345678911"
@@ -25,8 +27,9 @@ class TestAccount:
 
 
 
+class TestPromoCode:
     def test_promo_code_valid(self):
-        account = Account("John", "Doe", "12345678911", "PROM_12a")
+        account = Account("John", "Doe", "67055678911", "PROM_12a")
         assert account.balance == 50.0
     
 
@@ -50,3 +53,13 @@ class TestAccount:
     def test_promo_code_wrong_suffix_too_short(self):
         account = Account("John", "Doe", "12345678911", "PROM_1234")
         assert account.balance == 0.0
+
+
+class Test_Age_Restriction:
+    def test_age_not_valid(self):
+        account = Account("John", "Doe", "44055678911", "PROM_1234")
+        assert account.balance == 0.0
+
+    def test_age_valid(self):
+        account = Account("John", "Doe", "67055678911", "PROM_1234")
+        assert account.balance == 50.0
