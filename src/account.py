@@ -5,7 +5,6 @@ class Account:
         self.balance = 50.0 if self.is_promo_code_valid(promo_code) else 0.0
         self.pesel = pesel if self.is_pesel_valid(pesel) else "Invalid"
         self.balance = 50.0 if self.is_age_valid(pesel) else 0.0
-    
         
 
     def is_pesel_valid(self, pesel):
@@ -32,3 +31,12 @@ class Account:
             return False
     
         return year > 1960
+    
+    def incoming_transfer(self, money):
+        self.balance += money
+        return self.balance
+            
+
+    def outgoing_transfer(self, money):
+        self.balance -= money
+        return self.balance
