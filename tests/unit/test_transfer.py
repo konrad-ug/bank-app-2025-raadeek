@@ -16,11 +16,14 @@ class TestTransfer:
     def test_outgoing_transfer_suffiecient_balance(self):
         account = Account()
         account.balance = 100.0
-        account.outgoing_transfer(40.0)
-        assert account.balance == 60
+        result = account.outgoing_transfer(40.0)
+        assert result is True
+        assert account.balance == 60.0
 
     def test_outgoing_transfer_insufficenit_balance(self):
         account = Account()
         account.incoming_transfer(100.0)
-        account.outgoing_transfer(150.0)
-        assert account.balance == -50
+
+        result = account.outgoing_transfer(150.0)
+        assert result is False
+        assert account.balance == 100.0
