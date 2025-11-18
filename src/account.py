@@ -1,22 +1,24 @@
 class Account:
     def __init__(self):
         self.balance = 0.0
-        
-    def incoming_transfer(self, money):
-        self.balance += money
-        return self.balance
-            
+        self.history = []  
 
-    def outgoing_transfer(self, money) -> bool:
+    def incoming_transfer(self, money: float):
+        self.balance += money
+        self.history.append(float(money))
+        return self.balance
+
+    def outgoing_transfer(self, money: float) -> bool:
         if self.balance >= money:
             self.balance -= money
-            return True
-        return False
-    
-    def express_outgoing_transfer(self, money, fee) -> bool:
-        if self.balance >= money:
-            self.balance -= (money + fee)
+            self.history.append(-float(money))
             return True
         return False
 
-    
+    def express_outgoing_transfer(self, money: float, fee: float) -> bool:
+        if not self.outgoing_transfer(money):
+            return False
+
+        self.balance -= fee
+        self.history.append(-float(fee))
+        return True
