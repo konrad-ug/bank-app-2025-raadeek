@@ -13,5 +13,11 @@ class Account:
             return True
         return False
     
+    def express_outgoing_transfer(self, money, fee) -> bool:
+        if self.balance >= money:
+            self.balance -= (money + fee)
+            return True
+        return False
+    
 
     

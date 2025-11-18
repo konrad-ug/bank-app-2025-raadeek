@@ -10,3 +10,6 @@ class Company_Account(Account):
     def valid_nip(self, nip):
         return len(nip) == 10 and nip.isdigit()
     
+    def express_outgoing_transfer(self, money) -> bool:
+        return super().express_outgoing_transfer(money, fee = 5.0)
+    
