@@ -18,6 +18,5 @@ class Account:
             self.balance -= (money + fee)
             return True
         return False
-    
 
     
