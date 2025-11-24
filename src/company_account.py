@@ -13,3 +13,14 @@ class Company_Account(Account):
     def express_outgoing_transfer(self, money) -> bool:
         return super().express_outgoing_transfer(money, fee = 5.0)
     
+    def take_loan(self, amount: float) -> bool:
+        condition_balance = self.balance >= 2 * amount
+
+        condition_zus = -1775.0 in self.history
+
+        if condition_balance and condition_zus:
+            self.balance += amount
+            return True
+
+        return False
+    
