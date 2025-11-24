@@ -42,3 +42,16 @@ class PersonalAccount(Account):
     
     def express_outgoing_transfer(self, money) -> bool:
         return super().express_outgoing_transfer(money, fee = 1.0)
+    
+    def _last_three_are_deposits(self) -> bool:
+        return len(self.history) >= 3 and all(x > 0 for x in self.history[-3:])
+
+    def _sum_of_last_five_greater_than(self, credit: float) -> bool:
+        return len(self.history) >= 5 and sum(self.history[-5:]) > credit
+
+    def submit_for_loan(self, credit: float) -> bool:
+        if self._last_three_are_deposits() or self._sum_of_last_five_greater_than(credit):
+            self.balance += credit
+            return True
+        return False
+
