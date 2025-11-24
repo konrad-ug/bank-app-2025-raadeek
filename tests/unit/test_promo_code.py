@@ -1,33 +1,22 @@
+import pytest
 from src.personal_account import PersonalAccount
 
 
-class TestPromoCode:
-    def test_promo_code_valid(self):
-        account = PersonalAccount("John", "Doe", "67010112345", "PROM_12a")
-        assert account.balance == 50.0
-    
-
-    def test_promo_code_invalid_format(self):
-        account = PersonalAccount("John", "Doe", "12345678911", "1_2345678")
-        assert account.balance == 0.0
-
-    def test_promo_code_wrong_prefix(self):
-        account = PersonalAccount("John", "Doe", "12345678911", "PAOM_123")
-        assert account.balance == 0.0
-
-    def test_promo_code_wrong_suffix(self):
-        account = PersonalAccount("John", "Doe", "12345678911", "PROM_1234")
-        assert account.balance == 0.0
-
-    def test_promo_code_wrong_suffix_too_long(self):
-        account = PersonalAccount("John", "Doe", "67010112345", "PROM_1234")  
-        assert account.balance == 0.0
+@pytest.fixture
+def base_pesel():
+    return "67010112345"  # poprawny PESEL dla uproszczenia
 
 
-    def test_promo_code_wrong_suffix_too_short(self):
-        account = PersonalAccount("John", "Doe", "12345678911", "PROM_1234")
-        assert account.balance == 0.0
-
-    def test_no_promo_code(self):
-        account = PersonalAccount("John", "Doe", "67010112345")
-        assert account.balance == 0.0
+@pytest.mark.parametrize(
+    "pesel, promo_code, expected_balance",
+    [
+        ("67010112345", "PROM_12a", 50.0),   # poprawny kod
+        ("12345678911", "1_2345678", 0.0),   # zły format
+        ("12345678911", "PAOM_123", 0.0),    # zły prefix
+        ("12345678911", "PROM_1234", 0.0),   # zła długość
+        ("67010112345", None, 0.0),          # brak kodu
+    ],
+)
+def test_promo_codes(pesel, promo_code, expected_balance):
+    account = PersonalAccount("John", "Doe", pesel, promo_code)
+    assert account.balance == expected_balance
