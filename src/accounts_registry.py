@@ -4,8 +4,17 @@ class AccountsRegistry:
     def __init__(self):
         self.accounts = []
 
-    def add_account(self, account: PersonalAccount):
+    def add_account(self, account: PersonalAccount) -> tuple[bool, str]:
+        """
+        Add account to registry.
+        Returns: (success: bool, message: str)
+        """
+        # Check if PESEL already exists
+        if self.find_by_pesel(account.pesel) is not None:
+            return False, "PESEL already exists"
+        
         self.accounts.append(account)
+        return True, "Account added successfully"
 
     def find_by_pesel(self, pesel: str):
         for acc in self.accounts:
