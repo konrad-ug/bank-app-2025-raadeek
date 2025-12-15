@@ -16,7 +16,11 @@ def create_account():
         return jsonify({"error": "Missing required fields"}), 400
     
     account = PersonalAccount(data["name"], data["surname"], data["pesel"])
-    registry.add_account(account)
+    success, message = registry.add_account(account)
+    
+    if not success:
+        return jsonify({"error": message}), 409
+    
     return jsonify({"message": "Account created"}), 201
 
 
@@ -92,6 +96,43 @@ def delete_account(pesel):
         return jsonify({"error": "Account not found"}), 404
     
     return jsonify({"message": "Account deleted"}), 200
+
+
+@app.route("/api/accounts/<pesel>/transfer", methods=['POST'])
+def transfer(pesel):
+    """Transfer money to/from account"""
+    print(f"Transfer request for PESEL: {pesel}")
+    
+    account = registry.find_by_pesel(pesel)
+    if account is None:
+        return jsonify({"error": "Account not found"}), 404
+    
+    data = request.get_json()
+    
+    if not data or "amount" not in data or "type" not in data:
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    amount = data["amount"]
+    transfer_type = data["type"]
+    
+    if transfer_type == "incoming":
+        account.incoming_transfer(amount)
+        return jsonify({"message": "Zlecenie przyjęto do realizacji"}), 200
+    
+    elif transfer_type == "outgoing":
+        success = account.outgoing_transfer(amount)
+        if not success:
+            return jsonify({"error": "Insufficient funds"}), 422
+        return jsonify({"message": "Zlecenie przyjęto do realizacji"}), 200
+    
+    elif transfer_type == "express":
+        success = account.express_outgoing_transfer(amount)
+        if not success:
+            return jsonify({"error": "Insufficient funds"}), 422
+        return jsonify({"message": "Zlecenie przyjęto do realizacji"}), 200
+    
+    else:
+        return jsonify({"error": "Unknown transfer type"}), 400
 
 
 if __name__ == '__main__':

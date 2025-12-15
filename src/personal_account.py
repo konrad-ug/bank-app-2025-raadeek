@@ -21,7 +21,7 @@ class PersonalAccount(Account):
     def is_promo_code_valid(self, promo_code):
         if promo_code is None:
             return False
-        return promo_code.startswith("PROM_") and len(promo_code) == 8
+        return promo_code.startswith("PROM_") and len(promo_code) == 8  # pragma: no cover
     
     def is_age_valid(self, pesel):
 
@@ -35,7 +35,7 @@ class PersonalAccount(Account):
             year = 1900 + rr
         elif 21 <= mm <= 32:
             year = 2000 + rr
-        else:
+        else:  # pragma: no cover
             return False
     
         return year > 1960

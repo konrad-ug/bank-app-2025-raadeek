@@ -60,6 +60,28 @@ class TestCreateAccount:
         
         # API tworzy konto nawet z invalid PESEL, ale PESEL jest ustawiony na "Invalid"
         assert response.status_code == 201
+    
+    def test_create_account_duplicate_pesel(self, client):
+        """Test account creation with duplicate PESEL returns 409"""
+        pesel = "89092909825"
+        
+        # Create first account
+        response1 = client.post("/api/accounts", json={
+            "name": "james",
+            "surname": "hetfield",
+            "pesel": pesel
+        })
+        assert response1.status_code == 201
+        
+        # Try to create second account with same PESEL
+        response2 = client.post("/api/accounts", json={
+            "name": "lars",
+            "surname": "ulrich",
+            "pesel": pesel
+        })
+        
+        assert response2.status_code == 409
+        assert "PESEL already exists" in response2.get_json()["error"]
 
 
 class TestGetAllAccounts:
