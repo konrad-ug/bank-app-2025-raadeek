@@ -12,7 +12,6 @@ class DummyResp:
 
 @pytest.fixture(autouse=True)
 def mock_mf_global(monkeypatch):
-    """Global default: MF reports NIP as active ('Czynny')."""
 
     def fake_get(url, timeout=10):
         return DummyResp({'result': {'subject': {'statusVat': 'Czynny'}}})

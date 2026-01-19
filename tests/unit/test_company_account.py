@@ -13,7 +13,6 @@ class DummyResp:
 
 @pytest.fixture(autouse=True)
 def mock_mf_active(monkeypatch):
-    """Default: mock MF API to report NIP as active ('Czynny')."""
 
     def fake_get(url, timeout=10):
         return DummyResp({'result': {'subject': {'statusVat': 'Czynny'}}})
@@ -64,7 +63,6 @@ class Test_Company_Account:
 
 
 def test_company_nip_not_registered(monkeypatch):
-    """When MF reports non-active status, constructor should raise ValueError."""
 
     def fake_get_inactive(url, timeout=10):
         return DummyResp({'result': {'subject': {'statusVat': 'Zawieszony'}}})

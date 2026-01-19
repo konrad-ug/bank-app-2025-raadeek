@@ -1,8 +1,10 @@
 from src.account import Account
+from datetime import date
+from smtp.smtp import SMTPClient
 
 class PersonalAccount(Account):
     def __init__(self, first_name, last_name, pesel, promo_code=None):
-        super().__init__() # ustawia balance = 0.0
+        super().__init__() 
         self.first_name = first_name
         self.last_name = last_name
 
@@ -35,7 +37,7 @@ class PersonalAccount(Account):
             year = 1900 + rr
         elif 21 <= mm <= 32:
             year = 2000 + rr
-        else:  # pragma: no cover
+        else:  
             return False
     
         return year > 1960
@@ -54,4 +56,21 @@ class PersonalAccount(Account):
             self.balance += credit
             return True
         return False
+
+    def send_history_via_email(self, email_address: str) -> bool:
+        """
+        Send account transfer history via email
+        
+        Args:
+            email_address: Recipient email address
+            
+        Returns:
+            bool: True if email was sent successfully, False otherwise
+        """
+        today = date.today().isoformat()
+        subject = f"Account Transfer History {today}"
+        text = f"Personal account history: {self.history}"
+        
+        smtp_client = SMTPClient()
+        return smtp_client.send(subject, text, email_address)
 

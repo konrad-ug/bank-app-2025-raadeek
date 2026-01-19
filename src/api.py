@@ -8,7 +8,6 @@ registry = AccountsRegistry()
 
 @app.route("/api/accounts", methods=['POST'])
 def create_account():
-    """Create a new personal account"""
     data = request.get_json()
     print(f"Create account request: {data}")
     
@@ -26,7 +25,6 @@ def create_account():
 
 @app.route("/api/accounts", methods=['GET'])
 def get_all_accounts():
-    """Get all accounts"""
     print("Get all accounts request received")
     accounts = registry.get_all_accounts()
     accounts_data = [
@@ -43,7 +41,6 @@ def get_all_accounts():
 
 @app.route("/api/accounts/count", methods=['GET'])
 def get_account_count():
-    """Get total number of accounts"""
     print("Get account count request received")
     count = registry.count_accounts()
     return jsonify({"count": count}), 200
@@ -51,7 +48,6 @@ def get_account_count():
 
 @app.route("/api/accounts/<pesel>", methods=['GET'])
 def get_account_by_pesel(pesel):
-    """Get account by PESEL"""
     print(f"Get account by PESEL request: {pesel}")
     account = registry.find_by_pesel(pesel)
     
@@ -69,7 +65,6 @@ def get_account_by_pesel(pesel):
 
 @app.route("/api/accounts/<pesel>", methods=['PATCH'])
 def update_account(pesel):
-    """Update account (only name and/or surname)"""
     print(f"Update account request: {pesel}")
     account = registry.find_by_pesel(pesel)
     
@@ -88,7 +83,6 @@ def update_account(pesel):
 
 @app.route("/api/accounts/<pesel>", methods=['DELETE'])
 def delete_account(pesel):
-    """Delete account by PESEL"""
     print(f"Delete account request: {pesel}")
     success = registry.delete_account(pesel)
     
@@ -100,7 +94,6 @@ def delete_account(pesel):
 
 @app.route("/api/accounts/<pesel>/transfer", methods=['POST'])
 def transfer(pesel):
-    """Transfer money to/from account"""
     print(f"Transfer request for PESEL: {pesel}")
     
     account = registry.find_by_pesel(pesel)
