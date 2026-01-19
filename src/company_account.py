@@ -2,6 +2,7 @@ from src.account import Account
 import os
 import requests
 from datetime import date
+from smtp.smtp import SMTPClient
 
 
 class Company_Account(Account):
@@ -9,12 +10,10 @@ class Company_Account(Account):
         super().__init__()
         self.company_name = company_name
 
-        # If NIP has wrong length, accept but mark as Invalid and skip verification
         if not self.valid_nip(nip):
             self.nip = "Invalid"
             return
 
-        # For valid-length NIP, verify against MF registry
         verified = self.verify_nip_with_mf(nip)
         if not verified:
             raise ValueError("Company not registered!!")
@@ -25,18 +24,12 @@ class Company_Account(Account):
         return len(nip) == 10 and nip.isdigit()
 
     def verify_nip_with_mf(self, nip: str) -> bool:
-        """Call MF API to verify NIP. Returns True if statusVat == 'Czynny'.
-
-        Prints response JSON to logs for visibility.
-        Uses env var BANK_APP_MF_URL with a default test URL.
-        """
         base = os.environ.get("BANK_APP_MF_URL", "https://wl-test.mf.gov.pl")
         today = date.today().isoformat()
         url = f"{base.rstrip('/')}/api/search/nip/{nip}?date={today}"
 
         try:
             resp = requests.get(url, timeout=10)
-            # Attempt to parse JSON; print raw text if parse fails
             try:
                 j = resp.json()
             except Exception:
@@ -45,17 +38,13 @@ class Company_Account(Account):
 
             print(f"MF response: {j}")
 
-            # The API returns a structure that includes 'result' or direct fields.
-            # Try to find statusVat in known locations.
             status = None
             if isinstance(j, dict):
-                # common pattern: j.get('result', {}).get('subject', {}).get('statusVat')
                 if 'result' in j:
                     try:
                         status = j['result']['subject']['statusVat']
                     except Exception:
                         status = None
-                # fallback: direct 'statusVat'
                 if status is None and 'statusVat' in j:
                     status = j.get('statusVat')
 
@@ -77,4 +66,20 @@ class Company_Account(Account):
             return True
 
         return False
-    
+
+    def send_history_via_email(self, email_address: str) -> bool:
+        """
+        Send account transfer history via email
+        
+        Args:
+            email_address: Recipient email address
+            
+        Returns:
+            bool: True if email was sent successfully, False otherwise
+        """
+        today = date.today().isoformat()
+        subject = f"Account Transfer History {today}"
+        text = f"Company account history: {self.history}"
+        
+        smtp_client = SMTPClient()
+        return smtp_client.send(subject, text, email_address)
