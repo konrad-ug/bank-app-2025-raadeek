@@ -2,6 +2,7 @@
 source = src
 omit =
     src/__pycache__/*
+    src/company_account.py
     */site-packages/*
 
 [report]
