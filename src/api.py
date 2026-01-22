@@ -1,9 +1,18 @@
 from flask import Flask, request, jsonify
 from src.accounts_registry import AccountsRegistry
 from src.personal_account import PersonalAccount
+from src.mongo_repository import MongoAccountsRepository
 
 app = Flask(__name__)
 registry = AccountsRegistry()
+
+# Initialize MongoDB repository
+try:
+    db_repository = MongoAccountsRepository()
+except Exception as e:
+    print(f"Warning: MongoDB not available: {e}")
+    db_repository = None
+
 
 
 @app.route("/api/accounts", methods=['POST'])
@@ -126,6 +135,42 @@ def transfer(pesel):
     
     else:
         return jsonify({"error": "Unknown transfer type"}), 400
+
+
+@app.route("/api/accounts/save", methods=['POST'])
+def save_accounts_to_db():
+    """Save all accounts from registry to MongoDB"""
+    if db_repository is None:
+        return jsonify({"error": "Database not available"}), 503
+    
+    try:
+        accounts = registry.get_all_accounts()
+        db_repository.save_all(accounts)
+        return jsonify({"message": "Accounts saved successfully", "count": len(accounts)}), 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to save accounts: {str(e)}"}), 500
+
+
+@app.route("/api/accounts/load", methods=['POST'])
+def load_accounts_from_db():
+    """Load all accounts from MongoDB to registry"""
+    if db_repository is None:
+        return jsonify({"error": "Database not available"}), 503
+    
+    try:
+        # Clear current registry
+        registry.accounts = []
+        
+        # Load accounts from database
+        accounts = db_repository.load_all()
+        
+        # Add loaded accounts to registry
+        for account in accounts:
+            registry.accounts.append(account)
+        
+        return jsonify({"message": "Accounts loaded successfully", "count": len(accounts)}), 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to load accounts: {str(e)}"}), 500
 
 
 if __name__ == '__main__':

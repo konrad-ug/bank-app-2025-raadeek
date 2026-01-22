@@ -13,6 +13,17 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    
+    services:
+      mongo:
+        image: mongo:latest
+        options: >-
+          --health-cmd "mongosh --eval \"db.adminCommand('ping')\" --quiet || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 27017:27017
 
     steps:
     - uses: actions/checkout@v4
@@ -34,4 +45,4 @@ jobs:
         sleep 2
     - name: Execute API tests
       run: |
-        python3 -m pytest tests/unit/test_transfer_api.py -v
+        python3 -m pytest tests/unit/test_transfer_api.py tests/unit/test_accounts_persistence.py -v
