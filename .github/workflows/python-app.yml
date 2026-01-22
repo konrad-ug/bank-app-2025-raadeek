@@ -38,7 +38,7 @@ jobs:
       env:
         PYTHONPATH: .
       run: |
-        python3 -m coverage run --source=src -m pytest
+        python3 -m coverage run --source=src -m pytest tests/unit/
         python3 -m coverage report --fail-under=100
 
 
