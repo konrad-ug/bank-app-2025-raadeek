@@ -66,7 +66,7 @@ class TestIncomingTransfers:
         """
         Test creating an account and executing 100 incoming transfers.
         Each request should respond within 0.5 seconds.
-        Final balance should be 50 (initial) + 100 * 10 = 1050.
+        Final balance should be 0 (initial) + 100 * 10 = 1000.
         """
         base_url = api_client
         pesel = "85010112345"
@@ -90,16 +90,16 @@ class TestIncomingTransfers:
         )
         assert response.status_code == 200
         initial_balance = response.json()["balance"]
-        assert initial_balance == 50.0, "Initial balance should be 50"
+        assert initial_balance == 0.0, "Initial balance should be 0"
         
         # Execute 100 incoming transfers
         for i in range(self.NUM_TRANSFERS):
             start_time = time.time()
             response = requests.post(
-                f"{base_url}/api/transfers/incoming",
+                f"{base_url}/api/accounts/{pesel}/transfer",
                 json={
-                    "pesel": pesel,
-                    "amount": self.TRANSFER_AMOUNT
+                    "amount": self.TRANSFER_AMOUNT,
+                    "type": "incoming"
                 },
                 timeout=1.0
             )
