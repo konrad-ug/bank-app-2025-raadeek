@@ -74,3 +74,12 @@ class PersonalAccount(Account):
         smtp_client = SMTPClient()
         return smtp_client.send(subject, text, email_address)
 
+    def to_dict(self):
+        """Convert account to dictionary for persistence"""
+        return {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "pesel": self.pesel,
+            "balance": self.balance,
+            "history": self.history
+        }
