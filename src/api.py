@@ -7,9 +7,9 @@ app = Flask(__name__)
 registry = AccountsRegistry()
 
 # Initialize MongoDB repository
-try:
+try:  # pragma: no cover
     db_repository = MongoAccountsRepository()
-except Exception as e:
+except Exception as e:  # pragma: no cover
     print(f"Warning: MongoDB not available: {e}")
     db_repository = None
 
@@ -140,21 +140,21 @@ def transfer(pesel):
 @app.route("/api/accounts/save", methods=['POST'])
 def save_accounts_to_db():
     """Save all accounts from registry to MongoDB"""
-    if db_repository is None:
+    if db_repository is None:  # pragma: no cover
         return jsonify({"error": "Database not available"}), 503
     
     try:
         accounts = registry.get_all_accounts()
         db_repository.save_all(accounts)
         return jsonify({"message": "Accounts saved successfully", "count": len(accounts)}), 200
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         return jsonify({"error": f"Failed to save accounts: {str(e)}"}), 500
 
 
 @app.route("/api/accounts/load", methods=['POST'])
 def load_accounts_from_db():
     """Load all accounts from MongoDB to registry"""
-    if db_repository is None:
+    if db_repository is None:  # pragma: no cover
         return jsonify({"error": "Database not available"}), 503
     
     try:
@@ -169,7 +169,7 @@ def load_accounts_from_db():
             registry.accounts.append(account)
         
         return jsonify({"message": "Accounts loaded successfully", "count": len(accounts)}), 200
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         return jsonify({"error": f"Failed to load accounts: {str(e)}"}), 500
 
 

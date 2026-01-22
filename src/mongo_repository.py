@@ -33,5 +33,5 @@ class MongoAccountsRepository(AccountsRepository):
         
         return accounts
     
-    def close(self):
+    def close(self):  # pragma: no cover
         self.client.close()

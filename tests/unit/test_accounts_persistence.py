@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from src.api import app, registry
+from src.personal_account import PersonalAccount
 
 
 @pytest.fixture
@@ -80,13 +81,22 @@ class TestLoadAccountsEndpoint:
        
         registry.accounts = []
         
+        # Mock load_all to return accounts
+        loaded_account = PersonalAccount("loaded", "user", "77010112345")
+        loaded_account.balance = 999.0
+        mock_db_repository.load_all.return_value = [loaded_account]
         
         load_response = client.post("/api/accounts/load")
         
         assert load_response.status_code == 200
         data = load_response.get_json()
         assert data["message"] == "Accounts loaded successfully"
-        assert data["count"] >= 0
+        assert data["count"] == 1
+        
+        # Verify account was actually loaded into registry
+        assert len(registry.accounts) == 1
+        assert registry.accounts[0].pesel == "77010112345"
+        assert registry.accounts[0].balance == 999.0
     
     def test_load_clears_existing_accounts(self, client, mock_db_repository):
         # Create first account
@@ -103,6 +113,9 @@ class TestLoadAccountsEndpoint:
             "surname": "account",
             "pesel": "76010112345"
         })
+        
+        # Mock load_all to return different account
+        mock_db_repository.load_all.return_value = []
         
         response = client.post("/api/accounts/load")
         
